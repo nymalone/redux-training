@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from "react-redux"; 
+import { useDispatch, useSelector } from "react-redux"; 
 
 
 import { IProduct } from "../store/modules/cart/types";
-import { addProductToCart } from "../store/modules/cart/actions";
+import { addProductToCartRequest } from "../store/modules/cart/actions";
+import { IState } from '../store';
 
 interface CatalogItemProps {
   product: IProduct;
@@ -12,8 +13,13 @@ interface CatalogItemProps {
 const CatalogItem: React.FC<CatalogItemProps> = ({ product }) => {
   const dispatch = useDispatch();
 
+  //useSelector vai receber -> primeiro o estado global, e segundo o valor que vou resolver
+  const hasFailedStockCheck = useSelector<IState, boolean>(state => {
+    return state.cart.failedStockCheck.includes(product.id)
+  })
+
   const handleAddProductToCart = useCallback(() => {
-    dispatch(addProductToCart(product))
+    dispatch(addProductToCartRequest(product))
   },
   [dispatch, product])
 
@@ -28,6 +34,8 @@ const CatalogItem: React.FC<CatalogItemProps> = ({ product }) => {
     > 
       Comprar 
     </button>
+
+    { hasFailedStockCheck && <span style={{ color: 'red'}}>Falta de estoque.</span>}
   </article>
   );
 }
